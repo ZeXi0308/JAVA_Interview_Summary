@@ -12,7 +12,8 @@
 选定基础模型（e.g. Llama-3-8B, Qwen-7B）
 用 LoRA / QLoRA / 全参微调继续训练几 epoch
 产出 新权重（完全离线，可部署私有化）
-优点
+
+**优点**
 
 • 推理时无外部检索，延迟低
 
@@ -24,7 +25,6 @@
 
 • 微调后可能遗忘通用能力（需混合数据或低 lr）
 
-适用：案例一、二（静态、专有且稳定的知识）
 
 **2.2 RLHF – Reinforcement Learning from Human Feedback（含 DPO）**
 

@@ -109,3 +109,64 @@ sequenceDiagram
 
     HTTP协议传输的内容以header和body为主：
     ![alt text](image-5.png)
+
+---  
+
+### HTTP请求的结构：
+
+```dts
+POST /api/login HTTP/1.1                # 请求行：方法、路径、协议版本
+Host: www.example.com                   # 请求头：目标主机（域名）
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64)  # 请求头：客户端信息
+Accept: application/json                # 请求头：期望响应的数据类型
+Content-Type: application/json          # 请求头：请求体的数据格式
+Content-Length: 38                      # 请求头：请求体长度（字节数）
+Cookie: sessionid=xyz123abc             # 请求头：携带的 Cookie
+
+                                        # 空行：分隔头部和请求体
+
+{                                       # 请求体（Body）：实际要提交的数据
+  "username": "alice",
+  "password": "123456"
+}
+```
+
+websocket的数据包叫帧
+
+
+---
+4. **some supplements**
+
+
+    **1. 什么是RPC协议？**
+
+    RPC协议是一种让“调用远程服务器上的函数/方法”像调用本地函数一样简单的通信协议和规范。
+
+    - Remote：远程的，不在本地。
+    - Procedure：过程、函数、方法。
+    - Call：调用。
+
+    换句话说：
+    你在A服务器上写了代码，想调用B服务器的一个函数，用RPC协议就能像本地直接调用那样方便，底层的“网络通信、序列化、反序列化”等复杂细节都由RPC协议来处理。
+
+    底层大部分使用TCP协议，但这并不是必需选项。
+
+
+    **2. KCP**
+
+    KCP 是一个开源的、高性能的、基于 UDP 的可靠传输协议,为了让 UDP 也能像 TCP 一样可靠，但更灵活、更快。
+
+    #### 为什么需要KCP
+
+    - UDP 原生不保证可靠、顺序、重传，适合实时应用，但容易丢包。
+    - TCP 虽然可靠，但有“拥塞控制、队头阻塞、慢启动”等机制，导致延迟高、不适合实时场景。
+    - KCP 在 UDP 基础上自己实现了可靠传输、拥塞控制、流量控制等，兼顾了 UDP 的低延迟和 TCP 的可靠性，还能根据需求灵活调整。
+
+    #### KCP 的基本原理
+
+
+    - 客户端和服务端都用 UDP 通信，但数据不是直接发，而是交给 KCP 处理。
+    - KCP 负责把大数据分成小包，加上序号，丢了就重传，包乱了就排序。
+    - KCP 有自己的流量控制和拥塞控制机制，保证网络不被塞爆。
+    - 双方不断回传 ACK（确认包），丢了自动补发，保证数据可靠送达。
+
